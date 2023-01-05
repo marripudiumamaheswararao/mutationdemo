@@ -1,0 +1,54 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.1'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id 'info.solidsoft.pitest' version "1.9.0"
+}
+
+group = 'com.vmca'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	// https://mvnrepository.com/artifact/info.solidsoft.gradle.pitest/gradle-pitest-plugin
+//	implementation group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.9.0'
+	// https://mvnrepository.com/artifact/org.pitest/pitest-junit5-plugin
+	implementation group: 'org.pitest', name: 'pitest-junit5-plugin', version: '1.0.0'
+	// https://mvnrepository.com/artifact/org.pitest/pitest-entry
+	implementation group: 'org.pitest', name: 'pitest-entry', version: '1.10.3'
+// https://mvnrepository.com/artifact/org.pitest/pitest-parent
+	implementation group: 'org.pitest', name: 'pitest-parent', version: '1.10.3', ext: 'pom'
+
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+tasks {
+	pitest {
+		targetClasses = ['com.vmca.mutationdemo.*']  //by default "${project.group}.*"
+		pitestVersion = '1.9.0' //not needed when a default PIT version should be used
+		threads = 4
+		outputFormats = ['XML', 'HTML']
+		timestampedReports = false
+		junit5PluginVersion = '1.0.0'
+		excludedClasses = ['com.vmca.mutationdemo.model.*', 'com.vmca.mutationdemo.controller.*']
+		avoidCallsTo = ['org.slf4j.Logger']
+	}
+}
